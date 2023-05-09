@@ -16,6 +16,7 @@ bg2 = (137, 203, 57)
 red = (255, 0, 0)
 blue = (0, 0, 55)
 yellow = (255, 255, 0)
+orange = (255, 165, 0)
 
 class Snake:
     def __init__(self):
@@ -97,6 +98,18 @@ class Banana:
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, (self.posX, self.posY, pixels, pixels))
 
+class Orange:
+    def __init__(self):
+        self.color = orange
+        self.spawn()
+
+    def spawn(self):
+        self.posX = random.randrange(0, width, pixels)
+        self.posY = random.randrange(0, height, pixels)
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.color, (self.posX, self.posY, pixels, pixels))
+
 class Background:
     def draw(self, surface):
         surface.fill(bg1)
@@ -127,6 +140,10 @@ class Collision:
     def snake_clsn_banana(self, snake, banana):
         distance = math.sqrt(math.pow((snake.headX - banana.posX), 2) + math.pow((snake.headY - banana.posY), 2))
         return distance < pixels
+    
+    def snake_clsn_orange(self, snake, orange):
+        distance = math.sqrt(math.pow((snake.headX - orange.posX), 2) + math.pow((snake.headY - orange.posY), 2))
+        return distance < pixels
 
 
 class Score:
@@ -154,6 +171,7 @@ def main():
     snake = Snake()
     banana = Banana()
     apple = Apple()
+    orange = Orange()
     background = Background()
     collision = Collision()
     score = Score()
@@ -165,6 +183,7 @@ def main():
         snake.draw(screen)
         apple.draw(screen)
         banana.draw(screen)
+        orange.draw(screen)
         score.show(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -201,6 +220,8 @@ def main():
             #lose
             snake.die()
             apple.spawn()
+            banana.spawn()
+            orange.spawn()
             score.reset()
             time = 115
         
@@ -208,6 +229,8 @@ def main():
             #lose
             snake.die()
             apple.spawn()
+            banana.spawn()
+            orange.spawn()
             score.reset()
             time = 115
 
@@ -216,6 +239,10 @@ def main():
             score.increase()
             score.increase()
             time -= 10
+
+        if collision.snake_clsn_orange(snake, orange):
+            orange.spawn()
+            time += 10
 
         pygame.time.delay(time)
 
