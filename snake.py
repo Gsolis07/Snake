@@ -15,6 +15,7 @@ bg1 = (156, 210, 54)
 bg2 = (137, 203, 57)
 red = (255, 0, 0)
 blue = (0, 0, 55)
+yellow = (255, 255, 0)
 
 class Snake:
     def __init__(self):
@@ -84,6 +85,18 @@ class Apple:
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, (self.posX, self.posY, pixels, pixels))
 
+class Banana:
+    def __init__(self):
+        self.color = yellow
+        self.spawn()
+
+    def spawn(self):
+        self.posX = random.randrange(0, width, pixels)
+        self.posY = random.randrange(0, height, pixels)
+        
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.color, (self.posX, self.posY, pixels, pixels))
+
 class Background:
     def draw(self, surface):
         surface.fill(bg1)
@@ -110,6 +123,11 @@ class Collision:
             if distance < pixels:
                 return True
             return False
+        
+    def snake_clsn_banana(self, snake, banana):
+        distance = math.sqrt(math.pow((snake.headX - banana.posX), 2) + math.pow((snake.headY - banana.posY), 2))
+        return distance < pixels
+
 
 class Score:
     def __init__(self):
@@ -134,16 +152,19 @@ def main():
 
 #Objects
     snake = Snake()
+    banana = Banana()
     apple = Apple()
     background = Background()
     collision = Collision()
     score = Score()
+    time = 115
 
     #Mainloop
     while True:
         background.draw(screen)
         snake.draw(screen)
         apple.draw(screen)
+        banana.draw(screen)
         score.show(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -181,14 +202,22 @@ def main():
             snake.die()
             apple.spawn()
             score.reset()
+            time = 115
         
         if collision.head_clsn_body(snake):
             #lose
             snake.die()
             apple.spawn()
             score.reset()
+            time = 115
 
-        pygame.time.delay(115)
+        if collision.snake_clsn_banana(snake, banana):
+            banana.spawn()
+            score.increase()
+            score.increase()
+            time -= 10
+
+        pygame.time.delay(time)
 
         pygame.display.update()        
 
